@@ -1,0 +1,47 @@
+Environment_Report.txt
+======================
+Date: 24 June 2026
+System: Dhananjay's MacBook Air
+
+---Command 1: whoami---
+Command: whoami
+Output: dhananjaysaxena
+Observation: This command displays the currently logged-in username.
+The active user on this system is 'dhananjaysaxena'.
+
+---Command 2: id---
+Command: id
+Output: uid=501(dhananjaysaxena) gid=20(staff) groups=20(staff),12(everyone),
+61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm)...
+Observation: The 'id' command shows the user ID (uid=501), primary group (staff),
+and all supplementary groups. The user belongs to the 'admin' group,
+meaning they have administrative privileges on this system.
+
+---Command 3: echo $SHELL---
+Command: echo $SHELL
+Output: /bin/zsh
+Observation: The current shell being used is Zsh (Z Shell), located at /bin/zsh.
+macOS uses Zsh as its default shell since macOS Catalina.
+
+---Command 4: pwd---
+Command: pwd
+Output: /Users/dhananjaysaxena
+Observation: The current working directory is the home directory of the user
+'dhananjaysaxena'. On macOS, user home directories are located under /Users/.
+
+---Command 5: ls -la---
+Command: ls -la
+Output: Total 264 entries including hidden files and directories.
+Observation: The -l flag shows detailed file info (permissions, owner, size, date)
+and -a includes hidden files (starting with dot). The home directory contains
+development tools, project files, and system configuration files.
+Notable entries include AndroidStudioProjects, PyCharmMiscProject, eclipse,
+and various Java/HTML files indicating active development work.
+
+---Command 6: ping -c 4 google.com---
+Command: ping -c 4 google.com
+Output: 4 packets transmitted, 4 received, 0.0% packet loss
+        round-trip min/avg/max = 41.857/44.360/45.911 ms
+Observation: The ping command sent 4 ICMP packets to google.com (192.178.158.138).
+All 4 packets were received with 0% packet loss, confirming active internet
+connectivity. Average response time of ~44ms indicates a healthy connection.
