@@ -1,0 +1,74 @@
+Storage_Assessment_Report.txt
+==============================
+Date: 24 June 2026
+System: Dhananjay's MacBook Air
+
+---Command 1: diskutil list---
+Command: diskutil list
+Output: /dev/disk0 (internal, physical) - 251.0 GB total
+  - disk0s1: Apple_APFS_ISC Container - 524.5 MB
+  - disk0s2: Apple_APFS Container - 245.1 GB
+  - disk0s3: Apple_APFS_Recovery - 5.4 GB
+  /dev/disk3 (synthesized) - 245.1 GB
+  - disk3s1: APFS Volume Macintosh HD - 12.6 GB
+  - disk3s2: APFS Volume Preboot - 9.0 GB
+  - disk3s3: APFS Volume Recovery - 1.3 GB
+  - disk3s5: APFS Volume Data - 164.8 GB
+  - disk3s6: APFS Volume VM - 4.3 GB
+Observation: The system uses Apple APFS file system on a 251GB
+internal SSD. The disk is divided into multiple volumes including
+the main Macintosh HD, Data, Preboot, Recovery, and VM volumes.
+APFS allows these volumes to share the same pool of storage space.
+
+---Command 2: df -h (Mounted File Systems)---
+Command: df -h
+Output:
+  /dev/disk3s1s1  228Gi total, 12Gi used, 59Gi free (17% used) -> /
+  /dev/disk3s6    228Gi, 4.0Gi used (7%)  -> /System/Volumes/VM
+  /dev/disk3s2    228Gi, 8.4Gi used (13%) -> /System/Volumes/Preboot
+  /dev/disk3s5    228Gi, 144Gi used (71%) -> /System/Volumes/Data
+Observation: The root filesystem has 228GB total with 17% used.
+The Data volume is the most utilized at 71% (144GB used out of 228GB).
+The VM volume handles virtual memory. All APFS volumes share the
+same underlying storage pool from disk0s2.
+
+---Command 3: du -sh ~/ (Home Directory Usage)---
+Command: du -sh ~/
+Output: 70G /Users/dhananjaysaxena
+Observation: The home directory consumes 70GB of storage. Many
+"Operation not permitted" messages appeared for protected system
+Library folders - this is normal macOS security behavior (SIP).
+The actual accessible user data totals 70GB including Downloads,
+Documents, Applications and development project files.
+
+---Command 4: df -i (Inode Utilization)---
+Command: df -i
+Output:
+  /dev/disk3s1s1: 478724992 total inodes, 24552656 used,
+                  124066088 free (17% iused)
+  /dev/disk3s5:   478724992 total inodes, 301280216 used,
+                  124066088 free (71% iused)
+Observation: Inode usage mirrors disk usage percentages. The Data
+volume has 71% of inodes used (301 million out of 478 million).
+Inode exhaustion would prevent new file creation even if disk space
+is available, so monitoring inode usage is as important as disk space.
+
+---Storage Health Observations---
+1. Total physical storage: 251 GB SSD (Apple internal)
+2. Main data volume: 71% used - approaching high utilization
+3. Home directory alone consumes 70GB
+4. Inode utilization at 71% on Data volume - should be monitored
+5. Recovery partition (1.3GB) and Preboot (9GB) are healthy
+6. VM volume at 7% indicates low swap usage - good system health
+7. Root filesystem at only 17% used - system files are well managed
+
+---Recommendations for Improving Storage Utilization---
+1. Clean Downloads folder - likely contains large unused files
+2. Remove unused development tools and project files to free space
+3. Use macOS Storage Management (Apple menu > About This Mac >
+   Storage) to identify large files
+4. Archive old projects to external storage or cloud
+5. Clear cache files periodically to reclaim disk space
+6. Monitor Data volume closely as it is at 71% - consider cleanup
+   before it reaches 85%+ which can impact performance
+7. Inode usage at 71% should be reviewed if many small files exist
