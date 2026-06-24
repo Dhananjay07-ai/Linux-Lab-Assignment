@@ -1,0 +1,87 @@
+IO_Investigation_Report.txt
+============================
+Date: 24 June 2026
+System: Dhananjay's MacBook Air
+
+---Command 1: lsof | head -20---
+Command: lsof | head -20
+Output: Listed 20 open files including loginwindow process (PID 407)
+        accessing system libraries, CoreServices, and framework files.
+Observation: The lsof (list open files) command shows all files currently
+open by running processes. Every running process keeps files open -
+including system libraries, configuration files, and device files.
+The loginwindow process had multiple system files open confirming
+macOS actively manages many files during normal operation.
+
+---Command 2: File Descriptors---
+Command: ls -la /dev/stdin /dev/stdout /dev/stderr
+Output:
+  /dev/stderr -> fd/2
+  /dev/stdin  -> fd/0
+  /dev/stdout -> fd/1
+Observation: Linux/macOS assigns standard file descriptors to every
+process: fd/0 = stdin (input), fd/1 = stdout (output), fd/2 = stderr
+(errors). These are symbolic links to the actual file descriptor
+entries, showing how the OS treats I/O streams as files.
+
+---Command 3: Output Redirection---
+Command: echo "This is standard output" > ~/output.txt
+         cat ~/output.txt
+Output: This is standard output
+Observation: The > operator redirects standard output (fd/1) from the
+terminal screen to a file. The cat command confirmed the content was
+successfully written to output.txt instead of displaying on screen.
+
+---Command 4: Error Redirection---
+Command: ls /nonexistent 2> ~/error.txt
+         cat ~/error.txt
+Output: ls: /nonexistent: No such file or directory
+Observation: The 2> operator redirects standard error (fd/2) to a file.
+The error message from the failed ls command was captured in error.txt
+instead of appearing on screen. This is useful for logging errors in
+applications and scripts.
+
+---Command 5: Combined Output and Error Redirection---
+Command: ls /nonexistent > ~/combined.txt 2>&1
+         cat ~/combined.txt
+Output: ls: /nonexistent: No such file or directory
+Observation: The 2>&1 syntax redirects stderr (fd/2) to wherever stdout
+(fd/1) is pointing - in this case combined.txt. This allows both normal
+output and errors to be captured in a single file, useful for
+comprehensive application logging.
+
+---Command 6: Resource Limits---
+Command: ulimit -a
+Output:
+  cpu time: unlimited
+  file size: unlimited
+  stack size: 8176 kb
+  processes: 1333
+  file descriptors: 256
+Observation: The ulimit command shows system resource limits for the
+current shell session. The system allows unlimited CPU time and file
+size but limits file descriptors to 256 and processes to 1333.
+These limits prevent any single process from consuming all system
+resources.
+
+---Command 7: Append Redirection---
+Command: echo "Appended line" >> ~/output.txt
+         cat ~/output.txt
+Output: This is standard output
+        Appended line
+Observation: The >> operator appends to an existing file without
+overwriting it. Unlike >, which replaces file content, >> adds new
+content at the end. This is critical for log files where historical
+data must be preserved.
+
+---How Linux Manages File I/O---
+1. Everything in Linux is treated as a file - devices, processes,
+   and network sockets all use file descriptors.
+2. Every process gets 3 default file descriptors: stdin(0),
+   stdout(1), stderr(2).
+3. Redirection operators (>, >>, 2>, 2>&1) allow flexible control
+   over where input/output flows.
+4. lsof shows that even idle systems have hundreds of open files
+   managed by the kernel at all times.
+5. ulimit protects system stability by capping resource usage
+   per process/session.
