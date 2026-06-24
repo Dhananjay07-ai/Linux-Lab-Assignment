@@ -1,0 +1,71 @@
+Link_Analysis_Report.txt
+=========================
+Date: 24 June 2026
+System: Dhananjay's MacBook Air
+
+---Command 1: Create original file---
+Command: echo "This is the original file" > ~/original.txt
+Output: File original.txt created successfully
+Observation: The echo command with > redirection created a new text file
+named original.txt in the home directory with the specified content.
+
+---Command 2: Create Hard Link---
+Command: ln ~/original.txt ~/hardlink.txt
+Output: hardlink.txt created successfully
+Observation: The ln command without any flag creates a hard link. A hard
+link is a direct reference to the same inode (actual data) on disk.
+Both files point to the exact same data blocks.
+
+---Command 3: Create Symbolic Link---
+Command: ln -s ~/original.txt ~/symlink.txt
+Output: symlink.txt created successfully
+Observation: The -s flag creates a symbolic (soft) link. Unlike a hard
+link, a symbolic link is just a pointer/shortcut to the original file's
+path, not to the actual data.
+
+---Command 4: Inode Numbers---
+Command: ls -li ~/original.txt ~/hardlink.txt ~/symlink.txt
+Output:
+  40431039 -rw-r----- original.txt
+  40431039 -rw-r----- hardlink.txt  (SAME inode as original)
+  40431151 lrwxr-x--- symlink.txt   (DIFFERENT inode)
+Observation: original.txt and hardlink.txt share the same inode number
+(40431039), confirming they point to the same data on disk. symlink.txt
+has a completely different inode (40431151) because it is just a pointer
+to the original file's path.
+
+---Command 5: File Contents---
+Command: cat ~/original.txt / cat ~/hardlink.txt / cat ~/symlink.txt
+Output: All three displayed "This is the original file"
+Observation: All three files showed identical content because they all
+reference the same underlying data. This confirms that links work
+transparently - reading any of them gives the same result.
+
+---Command 6: Delete Original File---
+Command: rm ~/original.txt
+Output:
+  cat ~/hardlink.txt -> "This is the original file" (WORKS)
+  cat ~/symlink.txt  -> No such file or directory (BROKEN)
+Observation: This is the key difference between hard and soft links.
+The hard link still works after deleting original.txt because the
+actual data on disk is preserved as long as at least one hard link
+exists. The symbolic link broke because it pointed to the file PATH
+which no longer exists.
+
+---Command 7: stat ~/hardlink.txt---
+Command: stat ~/hardlink.txt
+Output: inode 40431039, size 26 bytes, permissions -rw-r-----
+        Modified: Jun 24 12:26:30 2026
+Observation: The stat command shows detailed metadata of the file
+including inode number, size, permissions, and timestamps. Even after
+deleting original.txt, the hardlink retains all metadata confirming
+the data still exists on disk.
+
+---Conclusions---
+1. Hard links share the same inode as the original file - deleting
+   the original does NOT destroy the data.
+2. Symbolic links have their own inode and point to the file PATH -
+   deleting the original BREAKS the symbolic link.
+3. Hard links are more reliable for data preservation; symbolic links
+   are more flexible and can link across file systems.
+4. The inode is the true identity of a file in Linux - not its name.
