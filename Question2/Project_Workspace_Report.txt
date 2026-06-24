@@ -1,0 +1,62 @@
+Project_Workspace_Report.txt
+=============================
+Date: 24 June 2026
+System: Dhananjay's MacBook Air
+
+---Command 1: mkdir -p ~/project_workspace/{docs,src,logs}---
+Command: mkdir -p ~/project_workspace/{docs,src,logs}
+Output: Directory created with 3 subdirectories: docs, src, logs
+Observation: The mkdir command with -p flag creates the parent directory and
+all subdirectories in one command. The {} syntax creates multiple folders
+simultaneously. The workspace was successfully created.
+
+---Command 2: ls -la ~/project_workspace/ (BEFORE permission change)---
+Output: All 3 subdirectories showed permissions drwxr-xr-x
+Observation: Default permissions allow owner to read/write/execute,
+group and others to read and execute. This is too open for a secure
+project workspace.
+
+---Command 3: umask 027---
+Command: umask 027
+Output: (no output, applied silently)
+Observation: umask 027 means new files will deny write to group and
+deny all permissions to others. This ensures future files created
+are more secure by default.
+
+---Command 4: chmod 750 ~/project_workspace---
+Command: chmod 750 ~/project_workspace
+         chmod 640 ~/project_workspace/docs
+Output: Permissions changed. docs showed drw-r----- 
+Observation: chmod 750 gives owner full access, group read/execute,
+others no access. chmod 640 on docs gave owner read/write, group
+read only, others nothing. This was intentionally restrictive.
+
+---Command 5: Permission Denied Demonstration---
+Command: echo "Project Documentation" > ~/project_workspace/docs/readme.txt
+Output: zsh: permission denied
+Observation: This error confirmed that chmod 640 on docs was working
+correctly - even the owner could not write because execute permission
+was missing on the directory. This demonstrated how Linux enforces
+directory permissions strictly.
+
+---Command 6: chmod 750 ~/project_workspace/docs (Fix)---
+Command: chmod 750 ~/project_workspace/docs
+Output: readme.txt created successfully, permissions -rw-r-----
+Observation: After restoring execute permission on docs directory,
+the file was created successfully. The readme.txt shows permissions
+640 - owner can read/write, group can only read, others have no access.
+
+---Ownership Details---
+Owner: dhananjaysaxena
+Group: staff
+All files owned by the same user confirming secure single-user workspace.
+
+---How Permissions Protect Project Data---
+1. chmod 750 on workspace: Only owner has full control; group can read
+   but not modify; others have zero access.
+2. chmod 750 on docs: Prevents unauthorized users from reading
+   sensitive documentation.
+3. umask 027: Ensures all newly created files are secure by default
+   without needing manual permission changes each time.
+4. The permission denied error demonstrated that Linux strictly
+   enforces directory permissions, protecting data integrity.
